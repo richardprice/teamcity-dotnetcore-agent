@@ -1,17 +1,26 @@
 FROM jetbrains/teamcity-agent:latest
 
-## INSTALL DOTNETCORE
-RUN sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 417A0893
-RUN apt-get update
+ENV NUGET_XMLDOC_MODE=skip \
+    DOTNET_CLI_TELEMETRY_OPTOUT=true \
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true \
+    GIT_SSH_VARIANT=ssh
 
-RUN apt-get install -y --no-install-recommends dotnet-dev-1.0.1
-
-# Trigger the population of the local package cache
-ENV NUGET_XMLDOC_MODE skip
-RUN mkdir warmup \
-    && cd warmup \
-    && dotnet new \
-    && cd .. \
-    && rm -rf warmup \
-    && rm -rf /tmp/NuGetScratch
+RUN rm -rf /usr/share/dotnet
+RUN rm -rf /usr/bin/dotnet
+RUN rm -rf dotnet.tar.gz
+RUN curl -SL https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-linux-x64.tar.gz --output dotnet.tar.gz \
+        && mkdir -p /usr/share/dotnet \
+        && tar -zxf dotnet.tar.gz -C /usr/share/dotnet \
+        && rm dotnet.tar.gz \
+        && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet && \
+    \
+    mkdir warmup \
+        && cd warmup \
+        && dotnet new \
+        && cd .. \
+        && rm -rf warmup \
+        && rm -rf /tmp/NuGetScratch && \
+    \
+    apt-get clean all && \
+    \
+    usermod -aG docker buildagent

@@ -1,8 +1,4 @@
-## TeamCity Dotnet Core Agent Image Dockerfile
-
-This project contains the Dockerfile and all necessary scripts to build the Docker image and run a TeamCity Build Agent that can support Microsoft Dotnet Core builds inside the container.
-
-The Dockerfile currently installs Dotnet Core version 1.0.1, which as of creation is the current version of Dotnet Core.
+## Team City Build Agent with .Net Core SDK 2.1.300
 
 You can pull the ready-to-use image from the Docker Hub repository
                                      
